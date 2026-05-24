@@ -1,9 +1,18 @@
-function App() {
+export default function App() {
   return (
-    <div>
-      <h1>SHUBHAM AI OS 🚀</h1>
+    <div
+      style={{
+        background: '#050816',
+        color: 'cyan',
+        height: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        fontSize: '40px',
+        fontWeight: 'bold',
+      }}
+    >
+      SHUBHAM AI OS 🚀
     </div>
   )
 }
-
-export default App

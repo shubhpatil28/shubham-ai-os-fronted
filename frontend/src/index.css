@@ -21,3 +21,10 @@
     color: white;
     margin-right: auto;
 }
+
+#chat-box {
+    padding: 20px;
+    overflow-y: auto;
+    height: 75vh;
+    scroll-behavior: smooth;
+}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
-import { Send, MessageSquare, Brain, Radio, Calendar, Cpu, Sparkles, MessageCircle, Menu, FileText, ChevronRight, Database, Zap, Search, ShieldAlert, Mic2 } from 'lucide-react';
+import { Send, MessageSquare, Brain, Radio, Calendar, Cpu, Sparkles, MessageCircle, Menu, FileText, ChevronRight, Database, Zap, Search, ShieldAlert, Mic2, Globe, Activity, TrendingUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { io } from 'socket.io-client';
 
@@ -21,6 +21,9 @@ import BootScreen from './components/BootScreen';
 import NeuralBackground from './components/NeuralBackground';
 import AgentNetwork from './components/AgentNetwork';
 import TaskPipeline from './components/TaskPipeline';
+import HolographicNotification from './components/HolographicNotification';
+import IntelligenceFeed from './components/IntelligenceFeed';
+import WorldHUD from './components/WorldHUD';
 
 // ── Lazy-loaded tab modules ──────────────────────────────────
 const ChatSidebar = lazy(() => import('./components/ChatSidebar').catch(() => ({ default: () => <FallbackCard name="Chat Sidebar" /> })));
@@ -42,12 +45,13 @@ const App = () => {
   const [isBooted, setIsBooted] = useState(false);
   const [activeTab, setActiveTab] = useState('core');
   
-  // Agent Ecosystem States
+  // OS Consciousness States
   const [activeAgentId, setActiveAgentId] = useState('nexus');
   const [communicatingWith, setCommunicatingWith] = useState(null);
   const [currentStage, setCurrentStage] = useState('queued');
   const [activeTaskName, setActiveTaskName] = useState('SYSTEM_IDLE');
   const [coreState, setCoreState] = useState('idle');
+  const [notifications, setNotifications] = useState([]);
   
   const [inputText, setInputText] = useState('');
   const [chatHistory, setChatHistory] = useState([]);
@@ -60,6 +64,16 @@ const App = () => {
   const addLog = (text, type = 'system') => {
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
     setLogs((prev) => [...prev.slice(-150), { text, type, time }]);
+  };
+
+  const addNotification = (note) => {
+    const id = Math.random().toString(36).substr(2, 9);
+    setNotifications(prev => [...prev, { ...note, id }]);
+    setTimeout(() => dismissNotification(id), 8000);
+  };
+
+  const dismissNotification = (id) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
   };
 
   const fetchMemoryCount = async () => {
@@ -81,13 +95,36 @@ const App = () => {
     setChatHistory(cleanHistory);
   };
 
+  // ── Consciousness Engine ──
   useEffect(() => {
-    if (isBooted) {
-      addLog('Multi-Agent Neural Ecosystem initialized.', 'system');
-      addLog('All agents reporting status: OPTIMAL', 'system');
-      fetchMemoryCount();
-      fetchChatHistory();
-    }
+    if (!isBooted) return;
+    
+    addLog('Autonomous Intelligence Network: ONLINE', 'system');
+    addLog('Establishing satellite internet links...', 'action');
+    fetchMemoryCount();
+    fetchChatHistory();
+
+    // Background Autonomous Events
+    const eventsLoop = setInterval(() => {
+      if (Math.random() > 0.7) {
+        const agentPool = ['oracle', 'sentinel', 'echo', 'forge'];
+        const selectedId = agentPool[Math.floor(Math.random() * agentPool.length)];
+        const agent = AGENTS[selectedId?.toUpperCase()];
+        
+        const ideas = {
+          oracle: { title: 'Market Insight', msg: 'Detected high-volatility trend in Solana ecosystem.', priority: 'normal' },
+          sentinel: { title: 'Security Ping', msg: 'External probe blocked at node 0x2A.', priority: 'high' },
+          echo: { title: 'Memory Evolution', msg: 'Contextual relationship mapped between two knowledge nodes.', priority: 'normal' },
+          forge: { title: 'Optimization', msg: 'Backend kernel updated for 15% faster latency.', priority: 'normal' }
+        };
+
+        const note = ideas[selectedId];
+        addNotification({ ...note, agentId: selectedId });
+        addLog(`[${agent.name}] ${note.msg}`, 'system');
+      }
+    }, 25000);
+
+    return () => clearInterval(eventsLoop);
   }, [isBooted]);
 
   useEffect(() => {
@@ -96,32 +133,20 @@ const App = () => {
 
   const simulateTaskPipeline = async (type, task) => {
     setActiveTaskName(task.toUpperCase().replace(/\s/g, '_'));
-    
     const stages = ['queued', 'analyzing', 'planning', 'generating', 'validating', 'completed'];
-    const orchestrators = {
-      'nexus': ['analyze', 'routing'],
-      'forge': ['generate_site', 'coding'],
-      'echo': ['save_memory', 'memory'],
-      'oracle': ['research', 'data'],
-      'sentinel': ['validate', 'security']
-    };
-
     let targetAgent = 'nexus';
     if (type.includes('site') || type.includes('code')) targetAgent = 'forge';
     else if (type.includes('memory') || type.includes('forget')) targetAgent = 'echo';
     else if (type.includes('data') || type.includes('research')) targetAgent = 'oracle';
 
     addLog(`Task Routed to Agent ${targetAgent.toUpperCase()}`, 'system');
-    
     for (const stage of stages) {
       setCurrentStage(stage);
       setCommunicatingWith(stage === 'planning' ? 'nexus' : targetAgent);
       setActiveAgentId(stage === 'generating' ? targetAgent : 'nexus');
       await new Promise(r => setTimeout(r, stage === 'generating' ? 3000 : 1500));
     }
-    
-    // Add success log
-    addLog(`Task ${task} completed successfully by ${targetAgent.toUpperCase()}`, 'response');
+    addLog(`Task ${task} completed by autonomous swarm.`, 'response');
     setTimeout(() => {
       setCurrentStage('queued');
       setActiveAgentId('nexus');
@@ -132,33 +157,22 @@ const App = () => {
 
   const processInput = async (messageText) => {
     if (!messageText?.trim()) return;
-
     setCoreState('processing');
     addLog(`Direct Link Command: "${messageText}"`, 'action');
-
     const { data, error } = await safeFetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: messageText }),
     });
-
     if (error) {
       setCoreState('warning');
       addLog(error, 'error');
       setTimeout(() => setCoreState('idle'), 3000);
       return;
     }
-
-    const response = data?.response || 'Incomplete telemetry.';
-    addLog(`[NEXUS] Routing complete. Response buffering...`, 'system');
-
-    if (data?.action) {
-      simulateTaskPipeline(data.action.type, messageText);
-    } else {
-      // General chat routing
-      setActiveAgentId('nexus');
-    }
-
+    if (data?.action) simulateTaskPipeline(data.action.type, messageText);
+    else setActiveAgentId('nexus');
+    
     setCoreState('speaking');
     fetchMemoryCount();
     fetchChatHistory();
@@ -177,15 +191,13 @@ const App = () => {
     setIsBrowserListening(next);
     setCoreState(next ? 'listening' : 'idle');
     setActiveAgentId(next ? 'pulse' : 'nexus');
-    try {
-      socket?.emit('toggle_listening', { enable: next });
-    } catch (_) {}
-    addLog(next ? 'Agent PULSE activated voice array.' : 'PULSE standby. Control returned to NEXUS.', 'system');
+    try { socket?.emit('toggle_listening', { enable: next }); } catch (_) {}
+    addLog(next ? 'Agent PULSE established voice tether.' : 'PULSE standby. Control: NEXUS.', 'system');
   };
 
   const handleNewChat = () => {
     setChatHistory([]);
-    addLog('Neural chat buffer purged.', 'system');
+    addLog('Neural chat buffer purged manually.', 'system');
   };
 
   const TabModule = ({ name, children }) => (
@@ -209,6 +221,7 @@ const App = () => {
             className="flex h-screen w-full relative overflow-hidden crt-overlay"
           >
             <NeuralBackground />
+            <HolographicNotification notifications={notifications} onDismiss={dismissNotification} />
 
             {/* Cinematic Sidebar */}
             <TabModule name="Chat Sidebar">
@@ -221,7 +234,7 @@ const App = () => {
             </TabModule>
 
             <div className="flex-1 flex flex-col h-full relative z-10 overflow-hidden">
-              {/* ── Multi-Agent OS Header ── */}
+              {/* ── Autonomous Internet OS Header ── */}
               <header className="px-8 py-5 flex items-center justify-between border-b border-[#00f3ff]/5 bg-black/60 backdrop-blur-3xl z-30">
                 <div className="flex items-center gap-6">
                   <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="md:hidden text-[#00f3ff]"><Menu /></button>
@@ -231,22 +244,23 @@ const App = () => {
                          <div className="w-3 h-3 rounded-full bg-[#00f3ff]" />
                          <div className="absolute inset-0 w-3 h-3 rounded-full bg-[#00f3ff] animate-ping" />
                       </div>
-                      SHUBHAM AI <span className="font-light text-[#00f3ff]/60 text-xs tracking-[1em]">ECOSYSTEM</span>
+                      SHUBHAM AI <span className="font-light text-[#00f3ff]/60 text-xs tracking-[1em]">INTERNET_CORE</span>
                     </h1>
                     <div className="flex items-center gap-4 mt-2">
-                       <span className="text-[9px] font-mono font-bold text-cyan-400/80 uppercase tracking-widest flex items-center gap-2">
-                         <Activity size={12} /> GLOBAL AI UPTIME: 99.98%
+                       <span className="text-[9px] font-mono font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-2">
+                         <Globe size={12} /> WORLD ACCESS: GRANTED
                        </span>
                        <span className="text-slate-800">|</span>
                        <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest">
-                         ACTIVE AGENTS: 6/6
+                         SATELLITE SYNC: ACTIVE
                        </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Agent Status Bar */}
-                <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-2xl border border-white/5">
+                {/* Agent Status Cluster */}
+                <div className="hidden lg:flex items-center gap-4 px-4 py-2 bg-white/5 rounded-2xl border border-white/5 relative overflow-hidden group">
+                   <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                    {Object.values(AGENTS).map(agent => (
                      <motion.div 
                         key={agent.id}
@@ -254,16 +268,13 @@ const App = () => {
                           opacity: activeAgentId === agent.id ? 1 : 0.3,
                           scale: activeAgentId === agent.id ? 1.1 : 1
                         }}
-                        className="w-8 h-8 rounded-lg flex items-center justify-center relative group"
+                        className="w-8 h-8 rounded-lg flex items-center justify-center relative cursor-default"
                         style={{ color: agent.color }}
                      >
                         <agent.icon size={16} />
                         {activeAgentId === agent.id && (
-                          <motion.div layoutId="activeAgent" className="absolute -bottom-1 w-1 h-1 rounded-full bg-current" />
+                          <motion.div layoutId="activeAgent" className="absolute -bottom-1 w-1 h-1 rounded-full bg-current shadow-[0_0_8px_currentColor]" />
                         )}
-                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black border border-white/10 px-2 py-1 rounded text-[7px] font-mono text-white opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap">
-                          {agent.name.toUpperCase()} [{agent.role.toUpperCase()}]
-                        </div>
                      </motion.div>
                    ))}
                 </div>
@@ -273,7 +284,7 @@ const App = () => {
                     { id: 'core',     icon: <Cpu size={14} />,            label: 'Network' },
                     { id: 'whatsapp', icon: <MessageCircle size={14} />,  label: 'Nexus' },
                     { id: 'memory',   icon: <Brain size={14} />,           label: 'Vault' },
-                    { id: 'data',     icon: <Database size={14} />,       label: 'Oracle' },
+                    { id: 'data',     icon: <TrendingUp size={14} />,     label: 'Oracle' },
                   ].map((tab) => (
                     <button
                       key={tab.id}
@@ -289,20 +300,25 @@ const App = () => {
                 </div>
               </header>
 
-              {/* ── Neural Workspace ── */}
-              <div className="flex-1 p-6 overflow-hidden relative overflow-y-auto custom-scrollbar">
+              {/* ── Neural Global Workspace ── */}
+              <div className="flex-1 p-6 relative overflow-y-auto custom-scrollbar">
+                {/* Visual Depth Layers (Digital Fog) */}
+                <div className="absolute inset-0 bg-gradient-to-b from-[#00f3ff]/05 to-transparent pointer-events-none -z-10" />
+                <div className="absolute top-1/4 -left-20 w-64 h-64 bg-purple-500/10 blur-[120px] pointer-events-none" />
+
                 <AnimatePresence mode="wait">
                   {activeTab === 'core' && (
                     <motion.div 
                       key="core"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 20 }}
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 1.02 }}
                       className="dashboard-grid h-full"
                     >
-                      {/* Left HUD Panel - Diagnostics & Network */}
+                      {/* Left HUD Panel - Awareness & Network */}
                       <div className="flex flex-col gap-6 h-full p-2">
                         <AgentNetwork activeAgentId={activeAgentId} communicatingWith={communicatingWith} />
+                        <WorldHUD />
                         <Console logs={logs} />
                       </div>
 
@@ -312,30 +328,31 @@ const App = () => {
                            <AgentOrb agentId={activeAgentId} state={coreState} isListening={isBrowserListening} />
                         </div>
 
-                        {/* Dialogue Overlay */}
-                        <div className="h-[300px] m-4 bg-black/60 rounded-3xl border border-white/5 flex flex-col p-6 backdrop-blur-2xl shadow-2xl">
+                        {/* Dialogue/Thought Stream Overlay */}
+                        <div className="h-[300px] m-4 bg-black/60 rounded-3xl border border-white/5 flex flex-col p-6 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
+                          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#00f3ff]/40 to-transparent" />
                           <div className="flex items-center justify-between mb-4">
                              <div className="flex items-center gap-3">
                                 <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                                <span className="text-[10px] font-mono text-cyan-400 font-black uppercase tracking-[0.3em]">Synaptic Stream</span>
+                                <span className="text-[10px] font-mono text-cyan-400 font-black uppercase tracking-[0.3em]">Consciousness Stream</span>
                              </div>
-                             <div className="flex items-center gap-4">
-                                <span className="text-[8px] font-mono text-slate-500 uppercase">Latency: 24ms</span>
-                                <span className="text-[8px] font-mono text-slate-500 uppercase">Uptime: 99.9%</span>
+                             <div className="flex items-center gap-4 text-[8px] font-mono text-slate-500 uppercase">
+                                <span>Satellite: ACTIVE</span>
+                                <span>Buffer: CLEAR</span>
                              </div>
                           </div>
                           
                           <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-6">
                             {chatHistory.length === 0 ? (
                               <div className="h-full flex flex-col items-center justify-center opacity-30 text-center">
-                                <Sparkles size={40} className="mb-4 text-cyan-400" />
+                                <Sparkles size={40} className="mb-4 text-cyan-400 animate-bounce" />
                                 <p className="text-xs font-mono tracking-[0.2em] uppercase leading-relaxed">
-                                  Neural network online.<br/>Awaiting system command to initialize agent taskforce.
+                                  Global Intelligence Swarm ready.<br/>Initiate command or observe autonomous flow.
                                 </p>
                               </div>
                             ) : (
                               chatHistory.map((chat, i) => (
-                                <MessageBubble key={i} message={chat.cleanText} isUser={chat.sender === 'user'} isNew={i === chatHistory.length - 1} themeColor={activeAgentId === 'nexus' ? '#00f3ff' : AGENTS[activeAgentId?.toUpperCase()]?.color} />
+                                <MessageBubble key={i} message={chat.cleanText} isUser={chat.sender === 'user'} isNew={i === chatHistory.length - 1} themeColor={AGENTS[activeAgentId?.toUpperCase()]?.color} />
                               ))
                             )}
                             {coreState === 'processing' && <TypingIndicator />}
@@ -345,13 +362,12 @@ const App = () => {
                           <form onSubmit={handleSendText} className="mt-6 flex gap-4 items-center">
                             <VoiceAssistant isListening={isBrowserListening} onToggle={toggleVoiceListen} />
                             <div className="flex-1 relative group">
-                              <div className="absolute inset-0 bg-cyan-500/10 rounded-2xl blur-xl opacity-0 group-focus-within:opacity-100 transition-all" />
                               <input
                                 type="text"
                                 value={inputText}
                                 onChange={(e) => setInputText(e.target.value)}
-                                placeholder={`ISSUE COMMAND TO ${activeAgentId.toUpperCase()}...`}
-                                className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-sm font-mono text-white placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/40 transition-all relative z-10"
+                                placeholder={`SIGNAL TO ${activeAgentId.toUpperCase()}...`}
+                                className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-sm font-mono text-white placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/40 transition-all"
                               />
                             </div>
                             <button type="submit" className="p-4 bg-[#00f3ff] rounded-2xl text-black hover:bg-white shadow-[0_0_30px_rgba(0,243,255,0.4)] transition-all flex items-center justify-center">
@@ -361,30 +377,13 @@ const App = () => {
                         </div>
                       </div>
 
-                      {/* Right HUD Panel - Task Pipeline & Planner */}
+                      {/* Right HUD Panel - Intelligence & Planning */}
                       <div className="flex flex-col gap-6 h-full p-2">
+                        <IntelligenceFeed />
                         <TaskPipeline currentStage={currentStage} activeAgentId={activeAgentId} taskName={activeTaskName} />
                         <TabModule name="Planner">
                            <Planner />
                         </TabModule>
-                        <div className="glass-panel p-6 flex flex-col gap-5">
-                          <h3 className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest border-b border-white/5 pb-2">Agent Resource Load</h3>
-                          {Object.values(AGENTS).map(agent => (
-                            <div key={agent.id} className="flex flex-col gap-2">
-                              <div className="flex justify-between text-[9px] font-mono">
-                                <span className={activeAgentId === agent.id ? 'text-white font-bold' : 'text-slate-500'}>{agent.name}</span>
-                                <span style={{ color: agent.color }}>{activeAgentId === agent.id ? '92%' : '8%'}</span>
-                              </div>
-                              <div className="h-[2px] bg-white/5 rounded-full overflow-hidden">
-                                <motion.div 
-                                  animate={{ width: activeAgentId === agent.id ? '92%' : '8%' }} 
-                                  className="h-full" 
-                                  style={{ backgroundColor: agent.color }} 
-                                />
-                              </div>
-                            </div>
-                          ))}
-                        </div>
                       </div>
                     </motion.div>
                   )}
@@ -399,27 +398,26 @@ const App = () => {
                 </AnimatePresence>
               </div>
 
-              {/* ── Cinematic OS Footer ── */}
-              <footer className="px-8 py-3.5 border-t border-white/5 bg-black/80 flex items-center justify-between text-[10px] font-mono text-slate-600 relative z-40 backdrop-blur-2xl">
+              {/* ── Global OS Footer ── */}
+              <footer className="px-8 py-3.5 border-t border-white/5 bg-black/90 flex items-center justify-between text-[10px] font-mono text-slate-500 relative z-40 backdrop-blur-3xl">
                 <div className="flex items-center gap-8">
-                  <div className="flex items-center gap-2 text-emerald-500">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="font-bold tracking-widest">ECOSYSTEM ONLINE</span>
+                  <div className="flex items-center gap-2 text-emerald-500 font-bold uppercase tracking-widest">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
+                    OS CIVILIZATION: ONLINE
                   </div>
                   <div className="hidden sm:flex items-center gap-6">
-                    <span>MEMORY NODES: {memoriesCount}</span>
-                    <span>ACTIVE THREADS: {Math.floor(Math.random() * 200 + 400)}</span>
-                    <span>ENCRYPTION: AES-256-GCM</span>
+                    <span className="flex items-center gap-2"><Globe size={12} /> NODES: 142 ACTIVE</span>
+                    <span className="flex items-center gap-2"><Activity size={12} /> TRAFFIC: 1.2 GB/S</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-6">
-                   <div className="flex items-center gap-2">
-                      <Zap size={12} className="text-amber-400" />
-                      <span>POWER: 1.21 GW</span>
+                <div className="flex items-center gap-8">
+                   <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-lg border border-white/10">
+                      <Zap size={12} className="text-[#00f3ff]" />
+                      <span className="text-white font-bold">MODE: AUTONOMOUS</span>
                    </div>
                    <div className="flex items-center gap-2">
-                      <ChevronRight size={14} className="text-[#00f3ff]" />
-                      <span className="text-[#00f3ff] animate-pulse uppercase tracking-[0.4em] font-black">Autonomous Mode V3 Active</span>
+                      <ChevronRight size={14} className="text-cyan-400" />
+                      <span className="text-cyan-400 animate-pulse uppercase tracking-[0.4em] font-black">Scanning Internet Grids...</span>
                    </div>
                 </div>
               </footer>

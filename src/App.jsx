@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, MessageSquare, Brain, Sun, Moon, Radio, Calendar, Cpu, Sparkles, MessageCircle, Menu } from 'lucide-react';
+import { Send, MessageSquare, Brain, Sun, Moon, Radio, Calendar, Cpu, Sparkles, MessageCircle, Menu, FileText } from 'lucide-react';
 import JarvisCore from './components/JarvisCore';
 import StatusPanel from './components/StatusPanel';
 import Console from './components/Console';
@@ -13,13 +13,15 @@ import ChatSidebar from './components/ChatSidebar';
 import MessageBubble from './components/MessageBubble';
 import TypingIndicator from './components/TypingIndicator';
 import VoiceAssistant from './components/VoiceAssistant';
+import DataHub from './components/DataHub';
 import { motion, AnimatePresence } from 'framer-motion';
-import io from 'socket.io-client';
+import { io } from 'socket.io-client';
 
 const socket = io('http://localhost:5000');
 
 const App = () => {
-  const [activeTab, setActiveTab] = useState('core'); // core | whatsapp | memory | builder
+  console.log("App component rendering...");
+  const [activeTab, setActiveTab] = useState('core'); // core | whatsapp | memory | builder | data
   const [coreStatus, setCoreStatus] = useState('sleeping');
   const [inputText, setInputText] = useState('');
   const [chatHistory, setChatHistory] = useState([]);
@@ -117,6 +119,8 @@ const App = () => {
             setActiveTab('memory');
           } else if (actType === 'generate_site') {
             setActiveTab('builder');
+          } else if (actType === 'analyze_data') {
+            setActiveTab('data');
           }
         }
 
@@ -218,6 +222,13 @@ const App = () => {
                 }`}
             >
               <Cpu size={12} /> Web Builder
+            </button>
+            <button
+              onClick={() => setActiveTab('data')}
+              className={`px-4 py-1.5 rounded-lg text-xs font-mono font-bold uppercase transition-all tracking-wider flex items-center gap-1.5 ${activeTab === 'data' ? 'bg-amber-400/10 text-amber-400' : 'text-slate-400 hover:text-white'
+                }`}
+            >
+              <FileText size={12} /> Data Hub
             </button>
           </div>
 
@@ -344,6 +355,17 @@ const App = () => {
                 className="h-full"
               >
                 <SiteBuilder onLog={addLog} />
+              </motion.div>
+            )}
+            {activeTab === 'data' && (
+              <motion.div
+                key="data"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="h-full"
+              >
+                <DataHub onLog={addLog} />
               </motion.div>
             )}
           </AnimatePresence>

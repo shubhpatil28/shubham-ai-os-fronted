@@ -58,7 +58,7 @@ const App = () => {
           try {
             const parsed = JSON.parse(item.message);
             if (parsed.response) text = parsed.response;
-          } catch {}
+          } catch { }
           return { ...item, cleanText: text };
         });
         setChatHistory(cleanHistory);
@@ -103,7 +103,7 @@ const App = () => {
         if (data.action_result) {
           addLog(`Result: ${data.action_result}`, 'response');
         }
-        
+
         setCoreStatus('speaking');
         fetchMemoryCount();
         fetchChatHistory();
@@ -165,8 +165,8 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-row relative overflow-hidden crt-overlay">
-      <ChatSidebar 
-        chatHistory={chatHistory} 
+      <ChatSidebar
+        chatHistory={chatHistory}
         onNewChat={handleNewChat}
         onDeleteChat={handleDeleteChat}
         isOpen={isSidebarOpen}
@@ -177,7 +177,7 @@ const App = () => {
         {/* HUD Header */}
         <header className="border-b border-[#00f3ff]/10 bg-slate-950/40 backdrop-blur-md px-6 py-4 flex items-center justify-between z-20">
           <div className="flex items-center gap-3">
-            <button 
+            <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className="md:hidden p-1.5 rounded-lg border border-[#00f3ff]/30 text-[#00f3ff] bg-[#00f3ff]/10 hover:bg-[#00f3ff]/20"
             >
@@ -188,182 +188,178 @@ const App = () => {
               SHUBHAM AI <span className="text-[#00f3ff] font-light animate-glitch cursor-default">OS_V3</span>
             </h1>
           </div>
-        
-        {/* Navigation Tabs */}
-        <div className="flex items-center gap-2 border border-slate-800 bg-slate-950/60 p-1 rounded-xl">
-          <button
-            onClick={() => setActiveTab('core')}
-            className={`px-4 py-1.5 rounded-lg text-xs font-mono font-bold uppercase transition-all tracking-wider flex items-center gap-1.5 ${
-              activeTab === 'core' ? 'bg-[#00f3ff]/10 text-[#00f3ff]' : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Radio size={12} /> Reactor Core
-          </button>
-          <button
-            onClick={() => setActiveTab('whatsapp')}
-            className={`px-4 py-1.5 rounded-lg text-xs font-mono font-bold uppercase transition-all tracking-wider flex items-center gap-1.5 ${
-              activeTab === 'whatsapp' ? 'bg-emerald-500/10 text-emerald-400' : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <MessageCircle size={12} /> WhatsApp Hub
-          </button>
-          <button
-            onClick={() => setActiveTab('memory')}
-            className={`px-4 py-1.5 rounded-lg text-xs font-mono font-bold uppercase transition-all tracking-wider flex items-center gap-1.5 ${
-              activeTab === 'memory' ? 'bg-[#bd00ff]/10 text-[#bd00ff]' : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Brain size={12} /> Memory Vault
-          </button>
-          <button
-            onClick={() => setActiveTab('builder')}
-            className={`px-4 py-1.5 rounded-lg text-xs font-mono font-bold uppercase transition-all tracking-wider flex items-center gap-1.5 ${
-              activeTab === 'builder' ? 'bg-cyan-400/10 text-cyan-400' : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Cpu size={12} /> Web Builder
-          </button>
-        </div>
 
-        <div className="flex items-center gap-6 font-mono text-[10px] text-slate-400">
-          <div>COGNITIVE LINK: <span className="text-emerald-400 font-bold">STABLE</span></div>
-          <div>DATE: {new Date().toLocaleDateString()}</div>
-        </div>
-      </header>
-
-      {/* Main Workspace Area based on activeTab */}
-      <div className="flex-1 overflow-hidden">
-        <AnimatePresence mode="wait">
-          {activeTab === 'core' && (
-            <motion.main 
-              key="core"
-              initial={{ opacity: 0, scale: 0.98, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 1.02, y: -10 }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-              className="dashboard-grid h-full p-6 gap-6"
+          {/* Navigation Tabs */}
+          <div className="flex items-center gap-2 border border-slate-800 bg-slate-950/60 p-1 rounded-xl">
+            <button
+              onClick={() => setActiveTab('core')}
+              className={`px-4 py-1.5 rounded-lg text-xs font-mono font-bold uppercase transition-all tracking-wider flex items-center gap-1.5 ${activeTab === 'core' ? 'bg-[#00f3ff]/10 text-[#00f3ff]' : 'text-slate-400 hover:text-white'
+                }`}
             >
-            {/* Left Diagnostics Console */}
-            <section className="flex flex-col gap-5 justify-between h-[75vh]">
-              <StatusPanel memoriesCount={memoriesCount} />
-              <Console logs={logs} />
-            </section>
+              <Radio size={12} /> Reactor Core
+            </button>
+            <button
+              onClick={() => setActiveTab('whatsapp')}
+              className={`px-4 py-1.5 rounded-lg text-xs font-mono font-bold uppercase transition-all tracking-wider flex items-center gap-1.5 ${activeTab === 'whatsapp' ? 'bg-emerald-500/10 text-emerald-400' : 'text-slate-400 hover:text-white'
+                }`}
+            >
+              <MessageCircle size={12} /> WhatsApp Hub
+            </button>
+            <button
+              onClick={() => setActiveTab('memory')}
+              className={`px-4 py-1.5 rounded-lg text-xs font-mono font-bold uppercase transition-all tracking-wider flex items-center gap-1.5 ${activeTab === 'memory' ? 'bg-[#bd00ff]/10 text-[#bd00ff]' : 'text-slate-400 hover:text-white'
+                }`}
+            >
+              <Brain size={12} /> Memory Vault
+            </button>
+            <button
+              onClick={() => setActiveTab('builder')}
+              className={`px-4 py-1.5 rounded-lg text-xs font-mono font-bold uppercase transition-all tracking-wider flex items-center gap-1.5 ${activeTab === 'builder' ? 'bg-cyan-400/10 text-cyan-400' : 'text-slate-400 hover:text-white'
+                }`}
+            >
+              <Cpu size={12} /> Web Builder
+            </button>
+          </div>
 
-            {/* Center Circular Core & Chat Panel */}
-            <section className="glass-panel flex flex-col justify-between p-6 h-[75vh]">
-              {/* Reactor Core */}
-              <div className="flex-1 flex items-center justify-center">
-                <AIOrb />
-              </div>
+          <div className="flex items-center gap-6 font-mono text-[10px] text-slate-400">
+            <div>COGNITIVE LINK: <span className="text-emerald-400 font-bold">STABLE</span></div>
+            <div>DATE: {new Date().toLocaleDateString()}</div>
+          </div>
+        </header>
 
-              {/* Interactive Dialogue Log */}
-              <div className="h-[220px] flex flex-col border border-slate-800/40 bg-slate-950/20 rounded-xl p-4 mt-4">
-                <span className="text-[9px] font-mono text-slate-500 block mb-2 uppercase tracking-widest flex items-center gap-1">
-                  <MessageSquare size={10} /> dialogue interface
-                </span>
-                <div className="flex-1 overflow-y-auto pr-1 mb-3 custom-scrollbar">
-                  {chatHistory.length === 0 ? (
-                    <div className="text-center text-slate-500 font-mono text-xs py-8">
-                      INITIATE SYSTEM LOG OR GREET WAKE WORD "HEY BUDDY"
+        {/* Main Workspace Area based on activeTab */}
+        <div className="flex-1 overflow-hidden">
+          <AnimatePresence mode="wait">
+            {activeTab === 'core' && (
+              <motion.main
+                key="core"
+                initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 1.02, y: -10 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                className="dashboard-grid h-full p-6 gap-6"
+              >
+                {/* Left Diagnostics Console */}
+                <section className="flex flex-col gap-5 justify-between h-[75vh]">
+                  <StatusPanel memoriesCount={memoriesCount} />
+                  <Console logs={logs} />
+                </section>
+
+                {/* Center Circular Core & Chat Panel */}
+                <section className="glass-panel flex flex-col justify-between p-6 h-[75vh]">
+                  {/* Reactor Core */}
+                  <div className="flex-1 flex items-center justify-center">
+                    <AIOrb />
+                  </div>
+
+                  {/* Interactive Dialogue Log */}
+                  <div className="h-[220px] flex flex-col border border-slate-800/40 bg-slate-950/20 rounded-xl p-4 mt-4">
+                    <span className="text-[9px] font-mono text-slate-500 block mb-2 uppercase tracking-widest flex items-center gap-1">
+                      <MessageSquare size={10} /> dialogue interface
+                    </span>
+                    <div className="flex-1 overflow-y-auto pr-1 mb-3 custom-scrollbar">
+                      {chatHistory.length === 0 ? (
+                        <div className="text-center text-slate-500 font-mono text-xs py-8">
+                          INITIATE SYSTEM LOG OR GREET WAKE WORD "HEY BUDDY"
+                        </div>
+                      ) : (
+                        chatHistory.map((chat, index) => {
+                          const isUser = chat.sender === 'user';
+                          const isNew = index === chatHistory.length - 1; // Only animate the very last message
+                          return (
+                            <MessageBubble
+                              key={index}
+                              message={chat.cleanText}
+                              isUser={isUser}
+                              isNew={isNew}
+                            />
+                          );
+                        })
+                      )}
+                      {coreStatus === 'processing' && <TypingIndicator />}
+                      <div ref={chatEndRef} />
                     </div>
-                  ) : (
-                    chatHistory.map((chat, index) => {
-                      const isUser = chat.sender === 'user';
-                      const isNew = index === chatHistory.length - 1; // Only animate the very last message
-                      return (
-                        <MessageBubble 
-                          key={index}
-                          message={chat.cleanText}
-                          isUser={isUser}
-                          isNew={isNew}
-                        />
-                      );
-                    })
-                  )}
-                  {coreStatus === 'processing' && <TypingIndicator />}
-                  <div ref={chatEndRef} />
-                </div>
 
-                {/* Route Indicator */}
-                <RouteIndicator message={inputText} />
+                    {/* Route Indicator */}
+                    <RouteIndicator message={inputText} />
 
-                {/* Input form */}
-                <form onSubmit={handleSendText} className="flex gap-2 items-center mt-1">
-                  <VoiceAssistant 
-                    isListening={isBrowserListening} 
-                    onToggle={toggleVoiceListen} 
-                  />
-                  <input 
-                    type="text"
-                    value={inputText}
-                    onChange={(e) => setInputText(e.target.value)}
-                    placeholder="Transmit query text or click mic..."
-                    className="flex-1 bg-slate-950/60 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-[#00f3ff]/40"
-                  />
-                  <button 
-                    type="submit"
-                    className="p-2 rounded-lg bg-[#00f3ff]/10 border border-[#00f3ff]/30 text-[#00f3ff] hover:bg-[#00f3ff] hover:text-slate-950 transition-all"
-                  >
-                    <Send size={16} />
-                  </button>
-                </form>
-              </div>
-            </section>
+                    {/* Input form */}
+                    <form onSubmit={handleSendText} className="flex gap-2 items-center mt-1">
+                      <VoiceAssistant
+                        isListening={isBrowserListening}
+                        onToggle={toggleVoiceListen}
+                      />
+                      <input
+                        type="text"
+                        value={inputText}
+                        onChange={(e) => setInputText(e.target.value)}
+                        placeholder="Transmit query text or click mic..."
+                        className="flex-1 bg-slate-950/60 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-[#00f3ff]/40"
+                      />
+                      <button
+                        type="submit"
+                        className="p-2 rounded-lg bg-[#00f3ff]/10 border border-[#00f3ff]/30 text-[#00f3ff] hover:bg-[#00f3ff] hover:text-slate-950 transition-all"
+                      >
+                        <Send size={16} />
+                      </button>
+                    </form>
+                  </div>
+                </section>
 
-            {/* Right Planner Modules */}
-            <section className="flex flex-col gap-5 justify-between h-[75vh]">
-              <Planner />
-            </section>
-          </motion.main>
-        )}
+                {/* Right Planner Modules */}
+                <section className="flex flex-col gap-5 justify-between h-[75vh]">
+                  <Planner />
+                </section>
+              </motion.main>
+            )}
 
-        {activeTab === 'whatsapp' && (
-          <motion.div 
-            key="whatsapp"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="h-full"
-          >
-            <WhatsAppHub onLog={addLog} />
-          </motion.div>
-        )}
-        {activeTab === 'memory' && (
-          <motion.div 
-            key="memory"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="h-full"
-          >
-            <MemoryVault onLog={addLog} />
-          </motion.div>
-        )}
-        {activeTab === 'builder' && (
-          <motion.div 
-            key="builder"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="h-full"
-          >
-            <SiteBuilder onLog={addLog} />
-          </motion.div>
-        )}
-        </AnimatePresence>
-      </div>
-
-      {/* Memory Register footer */}
-      <footer className="bg-slate-950/20 border-t border-[#00f3ff]/5 py-2.5 px-6 flex items-center justify-between text-[9px] font-mono text-slate-500 z-10">
-        <div className="flex items-center gap-2">
-          <Brain size={12} className="text-[#00f3ff]" />
-          <span>COGNITIVE FACTS LOADED: {memoriesCount}</span>
+            {activeTab === 'whatsapp' && (
+              <motion.div
+                key="whatsapp"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="h-full"
+              >
+                <WhatsAppHub onLog={addLog} />
+              </motion.div>
+            )}
+            {activeTab === 'memory' && (
+              <motion.div
+                key="memory"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="h-full"
+              >
+                <MemoryVault onLog={addLog} />
+              </motion.div>
+            )}
+            {activeTab === 'builder' && (
+              <motion.div
+                key="builder"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="h-full"
+              >
+                <SiteBuilder onLog={addLog} />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-        <div>
-          SYSTEM STATUS: <span className="text-emerald-400 font-bold">ONLINE</span>
-        </div>
-        <span>BUDDY COMPANION V3.5</span>
-      </footer>
+
+        {/* Memory Register footer */}
+        <footer className="bg-slate-950/20 border-t border-[#00f3ff]/5 py-2.5 px-6 flex items-center justify-between text-[9px] font-mono text-slate-500 z-10">
+          <div className="flex items-center gap-2">
+            <Brain size={12} className="text-[#00f3ff]" />
+            <span>COGNITIVE FACTS LOADED: {memoriesCount}</span>
+          </div>
+          <div>
+            SYSTEM STATUS: <span className="text-emerald-400 font-bold">ONLINE</span>
+          </div>
+          <span>BUDDY COMPANION V3.5</span>
+        </footer>
       </div>
     </div>
   );

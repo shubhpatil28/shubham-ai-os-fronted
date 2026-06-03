@@ -1,30 +1,160 @@
-.message {
-    max-width: 70%;
-    padding: 15px;
-    margin: 10px;
-    border-radius: 15px;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    white-space: pre-wrap;
-    line-height: 1.5;
-    font-size: 18px;
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;500;700;900&family=JetBrains+Mono:wght@100;400;700&display=swap');
+
+:root {
+  --neon-cyan: #00f3ff;
+  --neon-blue: #0066ff;
+  --neon-purple: #bd00ff;
+  --neon-red: #ff0055;
+  --bg-dark: #020308;
+  --bg-card: rgba(6, 9, 20, 0.6);
+  --border-glow: rgba(0, 243, 255, 0.12);
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  font-family: 'Outfit', sans-serif;
+  color-scheme: dark;
 }
 
-.user-message {
-    background: #00f7ff;
-    color: black;
-    margin-left: auto;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: var(--neon-cyan) rgba(2, 6, 12, 0.5);
 }
 
-.ai-message {
-    background: #1e2a44;
-    color: white;
-    margin-right: auto;
+/* Custom Scrollbars */
+*::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+*::-webkit-scrollbar-track {
+  background: rgba(2, 6, 12, 0.3);
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(0, 243, 255, 0.2);
+  border-radius: 10px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-cyan);
 }
 
-#chat-box {
-    padding: 20px;
-    overflow-y: auto;
-    height: 75vh;
-    scroll-behavior: smooth;
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow: hidden; /* App handles scrolling internally */
+  user-select: none;
 }
+
+/* Cinematic Typography */
+.mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Glassmorphism HUD Panels */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glow);
+  border-radius: 12px;
+  box-shadow: 
+    0 10px 40px rgba(0, 0, 0, 0.5),
+    inset 0 0 30px rgba(0, 243, 255, 0.02);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.4s ease;
+}
+
+.glass-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.3), transparent);
+  animation: scanline-sweep 4s linear infinite;
+}
+
+/* HUD Element Utility */
+.hud-border {
+  border: 1px solid rgba(0, 243, 255, 0.1);
+  box-shadow: 0 0 15px rgba(0, 243, 255, 0.05);
+}
+
+/* Animations */
+@keyframes scanline-sweep {
+  0% { transform: translateY(-100%); opacity: 0; }
+  50% { opacity: 0.5; }
+  100% { transform: translateY(400%); opacity: 0; }
+}
+
+@keyframes floatOrb1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(50px, -30px) scale(1.1); }
+  66% { transform: translate(-30px, 40px) scale(0.9); }
+}
+
+@keyframes floatOrb2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-40px, -50px) scale(1.2); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.3; filter: blur(5px); }
+  50% { opacity: 0.6; filter: blur(8px); }
+}
+
+/* Glitch Effects */
+.glitch-text:hover {
+  animation: glitch 0.2s cubic-bezier(.25, .46, .45, .94) both infinite;
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); clip-path: inset(40% 0 61% 0); }
+  20% { transform: translate(-3px, 2px); clip-path: inset(20% 0 71% 0); }
+  40% { transform: translate(-3px, -2px); clip-path: inset(10% 0 81% 0); }
+  60% { transform: translate(3px, 2px); clip-path: inset(50% 0 31% 0); }
+  80% { transform: translate(3px, -2px); clip-path: inset(80% 0 5% 0); }
+  100% { transform: translate(0); }
+}
+
+/* Dashboard Grid Layout (Desktop) */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr 340px;
+  grid-template-rows: 1fr;
+  height: 100vh;
+  gap: 20px;
+  max-width: 1920px;
+  margin: 0 auto;
+}
+
+/* CRT Overlay System */
+.crt-overlay::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+              linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
+  z-index: 50;
+  background-size: 100% 3px, 3px 100%;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+/* Layout Helpers */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 243, 255, 0.15);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 243, 255, 0.4);
+}
+

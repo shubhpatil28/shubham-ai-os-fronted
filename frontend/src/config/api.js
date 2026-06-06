@@ -7,7 +7,7 @@ export const API_URL =
   'https://shubham-ai-backend.onrender.com';
 
 /** Default request timeout in milliseconds */
-const DEFAULT_TIMEOUT_MS = 15000;
+const DEFAULT_TIMEOUT_MS = 30000;
 
 /**
  * Safe fetch wrapper — adds timeout, try/catch and a standard error shape.
@@ -27,7 +27,7 @@ export async function safeFetch(path, options = {}, timeoutMs = DEFAULT_TIMEOUT_
         'Content-Type': 'application/json',
         ...(options.headers || {}),
       },
-      credentials: 'include',
+      credentials: 'omit',
       signal: controller.signal,
     });
     clearTimeout(timer);

@@ -431,7 +431,7 @@ const App = () => {
                           </div>
 
                           <form onSubmit={handleSendText} className="mt-6 flex gap-4 items-center">
-                            <VoiceAssistant isListening={isBrowserListening} onToggle={toggleVoiceListen} />
+                            <VoiceAssistant isListening={isBrowserListening} onToggle={toggleVoiceListen} onCommand={processInput} />
                             <div className="flex-1 relative group">
                               <input
                                 type="text"

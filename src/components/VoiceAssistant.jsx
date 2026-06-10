@@ -102,7 +102,22 @@ const VoiceAssistant = ({ isListening, onToggle, onCommand }) => {
         .trim()
         .toLowerCase();
 
-      console.log('VOICE_COMMAND_RECEIVED', transcript);
+      console.log('VOICE_TRANSCRIPT_RECEIVED', transcript);
+
+      // Filter out system startup/status phrases
+      const SYSTEM_MESSAGES = [
+        "voice assistant online",
+        "voice-assisted online",
+        "listening",
+        "standing by",
+        "processing",
+        "executing"
+      ];
+
+      if (SYSTEM_MESSAGES.includes(transcript.toLowerCase().trim())) {
+        return;
+      }
+
       setVoiceStatus('processing');
 
       const phrase = buildPhrase(transcript);
@@ -111,7 +126,7 @@ const VoiceAssistant = ({ isListening, onToggle, onCommand }) => {
       requestAnimationFrame(() => {
         setVoiceStatus('executing');
         onCommand?.(transcript);
-        console.log('VOICE_COMMAND_EXECUTED', transcript);
+        console.log('VOICE_COMMAND_SENT', transcript);
         setTimeout(() => {
           if (activeRef.current) setVoiceStatus('listening');
         }, 1500);

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
-import { Send, MessageSquare, Brain, Radio, Calendar, Cpu, Sparkles, MessageCircle, Menu, FileText, ChevronRight, Database, Zap, Search, ShieldAlert, Mic2, Globe, Activity, TrendingUp } from 'lucide-react';
+document.title = "SHUBHAM_OS_BUILD_8592F6C";
+import { Send, MessageSquare, Brain, Radio, Calendar, Cpu, Sparkles, MessageCircle, Menu, FileText, ChevronRight, Database, Zap, Search, ShieldAlert, Mic2, Globe, Activity, TrendingUp, Terminal } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { io } from 'socket.io-client';
 
@@ -36,13 +37,21 @@ const SystemControl = lazy(() => import('./components/SystemControl').catch(() =
 // ── Safe WebSocket init ──────────────────────────────────────
 let socket = null;
 try {
-  socket = io(API_URL, { transports: ['websocket', 'polling'], timeout: 5000 });
+  socket = io(API_URL, { 
+    transports: ['websocket', 'polling'], 
+    timeout: 30000,
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 5000
+  });
 } catch (e) {
   console.warn('[App] Socket.IO connection failed (non-fatal):', e.message);
 }
 
 // ── App ──────────────────────────────────────────────────────
 const App = () => {
+  console.log("APP_V5_RUNTIME_LOADED");
+  console.log("APP_COMPONENT_MOUNTED", "App.jsx");
   const [isBooted, setIsBooted] = useState(false);
   const [activeTab, setActiveTab] = useState('core');
   
@@ -148,6 +157,7 @@ const App = () => {
       setActiveAgentId(stage === 'generating' ? targetAgent : 'nexus');
       await new Promise(r => setTimeout(r, stage === 'generating' ? 3000 : 1500));
     }
+    addLog(`[OS] ROUTING_PATCH_V4: ACTIVE`, 'system');
     addLog(`Task ${task} completed by autonomous swarm.`, 'response');
     setTimeout(() => {
       setCurrentStage('queued');
@@ -158,33 +168,83 @@ const App = () => {
   };
 
   const processInput = async (messageText) => {
+    console.log("PROCESS_INPUT_CALLED", messageText);
     if (!messageText?.trim()) return;
-    const lowerText = messageText.toLowerCase();
+    
+    // ── STEP 1: NORMALIZE INPUT ──
+    const normalizedCommand = messageText
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, " ");
 
-    // Command Interception Layer
-    const systemTriggers = ['open chrome', 'open vscode', 'open whatsapp', 'open downloads', 'open documents', 'create folder', 'shutdown', 'restart'];
-    const matchedTrigger = systemTriggers.find(t => lowerText.includes(t));
+    const systemPatterns = [
+      /^open chrome$/,
+      /^open vscode$/,
+      /^open whatsapp$/,
+      /^open downloads$/,
+      /^open documents$/,
+      /^create folder\b/,
+      /^shutdown\b/,
+      /^restart\b/,
+      /^shutdown pc$/,
+      /^restart pc$/
+    ];
 
-    if (matchedTrigger) {
+    console.log("NORMALIZED_COMMAND", normalizedCommand);
+    const isSystemCommand = systemPatterns.some(pattern => pattern.test(normalizedCommand));
+    console.log("IS_SYSTEM_COMMAND", isSystemCommand);
+
+    console.log("ACTIVE_RUNTIME_PATCH: v4_CinematicApp");
+    console.log("INPUT:", messageText);
+    console.log("IS_SYSTEM:", isSystemCommand);
+
+    if (isSystemCommand) {
+      console.log("ROUTING_TO_SYSTEM_COMMAND");
+      console.log("ROUTED_TO_SYSTEM_COMMAND_V4");
+      addLog(`[MATCH] SYSTEM_COMMAND: ${normalizedCommand}`, 'system');
+      addLog(`[ACTION] DISPATCHING TO LOCAL AGENT...`, 'action');
+      
       setActiveTab('system');
       setActiveAgentId('terminus');
-      addLog(`System Directive Intercepted: ${matchedTrigger.toUpperCase()}`, 'action');
-      return; 
+
+      console.log("SYSTEM_REQUEST_SOURCE", window.location.pathname);
+      const { data, error } = await safeFetch('/api/system-command', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command: normalizedCommand }),
+      });
+
+      if (error) {
+        addLog(`[REELAY_ERROR] ${error}`, 'error');
+        setCoreState('warning');
+      } else {
+        const isSuccess = data.status === 'success' || data.status === 'pending';
+        addLog(data.message, isSuccess ? 'response' : 'error');
+        if (data.status === 'failed') setCoreState('warning');
+      }
+      return;
     }
 
+    // ── STEP 2: FALLBACK TO CHAT ──
+    console.log("ROUTING_TO_CHAT");
+    console.log("ROUTED_TO_CHAT");
     setCoreState('processing');
     addLog(`Direct Link Command: "${messageText}"`, 'action');
+    
+    console.log("CHAT_REQUEST_SOURCE", window.location.pathname);
     const { data, error } = await safeFetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: messageText }),
     });
+
     if (error) {
       setCoreState('warning');
       addLog(error, 'error');
       setTimeout(() => setCoreState('idle'), 3000);
       return;
     }
+    
     if (data?.action) simulateTaskPipeline(data.action.type, messageText);
     else setActiveAgentId('nexus');
     
@@ -260,6 +320,7 @@ const App = () => {
                          <div className="absolute inset-0 w-3 h-3 rounded-full bg-[#00f3ff] animate-ping" />
                       </div>
                       SHUBHAM AI <span className="font-light text-[#00f3ff]/60 text-xs tracking-[1em]">INTERNET_CORE</span>
+                      <span className="text-[10px] text-pink-500 font-mono font-bold">[DEBUG] APP_V5_RUNTIME_LOADED</span>
                     </h1>
                     <div className="flex items-center gap-4 mt-2">
                        <span className="text-[9px] font-mono font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-2">
@@ -394,12 +455,14 @@ const App = () => {
                       </div>
 
                       {/* Right HUD Panel - Intelligence & Planning */}
-                      <div className="flex flex-col gap-6 h-full p-2">
+                      <div className="flex flex-col gap-6 h-full p-2 w-full min-w-0">
                         <IntelligenceFeed />
                         <TaskPipeline currentStage={currentStage} activeAgentId={activeAgentId} taskName={activeTaskName} />
-                        <TabModule name="Planner">
-                           <Planner />
-                        </TabModule>
+                        <div className="w-full flex-1 min-w-0">
+                          <TabModule name="Planner">
+                             <Planner className="w-full" />
+                          </TabModule>
+                        </div>
                       </div>
                     </motion.div>
                   )}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { API_URL } from '../config/api';
 
 export default function RouteIndicator({ message }) {
+  console.log("APP_COMPONENT_MOUNTED", "RouteIndicator.jsx");
   const [routeData, setRouteData] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
 
@@ -11,13 +12,37 @@ export default function RouteIndicator({ message }) {
       return;
     }
 
+    const systemPatterns = [
+      /^open chrome$/,
+      /^open vscode$/,
+      /^open whatsapp$/,
+      /^open downloads$/,
+      /^open documents$/,
+      /^create folder\b/,
+      /^shutdown\b/,
+      /^restart\b/,
+      /^shutdown pc$/,
+      /^restart pc$/
+    ];
+
+    const isSystemCommand = systemPatterns.some(pattern => pattern.test(message.toLowerCase().trim()));
+
+    if (isSystemCommand) {
+      setRouteData({ mode: 'execute', label: 'SYSTEM CMD', emoji: '🖥️', confidence: 1.0 });
+      setIsTyping(false);
+      return;
+    }
+
     setIsTyping(true);
     const timeoutId = setTimeout(async () => {
       try {
+        console.log("ACTIVE_RUNTIME_PATCH: v4_RouteIndicator");
+        console.log("CHAT_REQUEST_SOURCE", window.location.pathname);
         const response = await fetch(`${API_URL}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: message })
+          body: JSON.stringify({ message: message }),
+          credentials: 'omit'
         });
         
         if (response.ok) {

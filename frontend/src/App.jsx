@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 document.title = "SHUBHAM_OS_BUILD_8592F6C";
-import { Send, MessageSquare, Brain, Radio, Calendar, Cpu, Sparkles, MessageCircle, Menu, FileText, ChevronRight, Database, Zap, Search, ShieldAlert, Mic2, Globe, Activity, TrendingUp, Terminal } from 'lucide-react';
+import { Send, MessageSquare, Brain, Radio, Calendar, Cpu, Sparkles, MessageCircle, Menu, FileText, ChevronRight, Database, Zap, Search, ShieldAlert, Mic2, Globe, Activity, TrendingUp,Terminal } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { io } from 'socket.io-client';
 
@@ -37,13 +37,7 @@ const SystemControl = lazy(() => import('./components/SystemControl').catch(() =
 // ── Safe WebSocket init ──────────────────────────────────────
 let socket = null;
 try {
-  socket = io(API_URL, { 
-    transports: ['websocket', 'polling'], 
-    timeout: 30000,
-    reconnection: true,
-    reconnectionAttempts: Infinity,
-    reconnectionDelay: 5000
-  });
+  socket = io(API_URL, { transports: ['websocket', 'polling'], timeout: 5000 });
 } catch (e) {
   console.warn('[App] Socket.IO connection failed (non-fatal):', e.message);
 }

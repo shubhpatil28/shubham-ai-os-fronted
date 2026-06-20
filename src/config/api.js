@@ -47,3 +47,19 @@ export async function safeFetch(path, options = {}, timeoutMs = DEFAULT_TIMEOUT_
     return { data: null, error: '⚠️ AI server temporarily unavailable. Check your connection.' };
   }
 }
+
+/**
+ * Keep-alive pinger — hits /api/ping every 4.5 minutes to prevent
+ * Render free-tier dyno from sleeping (which causes 503 on CORS preflights).
+ * Call once on app boot: keepAlive();
+ */
+export function keepAlive() {
+  const INTERVAL_MS = 4.5 * 60 * 1000; // 4 minutes 30 seconds
+  const ping = () => {
+    fetch(`${API_URL}/api/ping`, { method: 'GET', credentials: 'omit' })
+      .then(() => console.log('[keepAlive] ping ok'))
+      .catch((e) => console.warn('[keepAlive] ping failed:', e.message));
+  };
+  ping(); // immediate first ping on boot
+  setInterval(ping, INTERVAL_MS);
+}

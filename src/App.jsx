@@ -38,7 +38,7 @@ const SystemControl = lazy(() => import('./components/SystemControl').catch(() =
 let socket = null;
 try {
   socket = io(API_URL, { 
-    transports: ['websocket', 'polling'], 
+    transports: ['polling', 'websocket'], 
     timeout: 30000,
     reconnection: true,
     reconnectionAttempts: Infinity,
